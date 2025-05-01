@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #4F46E5;
-  --primary-light: #818CF8;
-  --primary-dark: #3730A3;
-  --accent: #F43F5E;
-  --accent-light: #FB7185;
+  --primary: #6366F1;
+  --primary-light: #A5B4FC;
+  --primary-dark: #4F46E5;
+  --accent: #EC4899;
+  --accent-light: #F472B6;
   --success: #10B981;
   --warning: #F59E0B;
   --danger: #EF4444;
-  --background: #F9FAFB;
-  --card: #FFFFFF;
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  --border: #E5E7EB;
+  --background: #0F172A;
+  --card: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #334155;
 }
 
 body {
   @apply bg-gray-50;
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: default;
+}
+
+/* Cursor effects */
+.cursor-pointer,
+button,
+a,
+select,
+input[type="checkbox"],
+input[type="radio"],
+input[type="submit"],
+.interactive {
+  cursor: pointer !important;
+}
+
+button:disabled {
+  cursor: not-allowed !important;
 }
 
 /* Modern card styles */
@@ -28,6 +45,24 @@ body {
   @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Vibrant shadow effects */
+.vibrant-shadow-indigo {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
+
+.vibrant-shadow-pink {
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+}
+
+.vibrant-shadow-success {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
 /* Modern button styles */
@@ -57,11 +92,50 @@ body {
   left: 100%;
 }
 
+.btn-modern:active {
+  transform: scale(0.95);
+}
+
+/* Click ripple effect */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.5s, opacity 1s;
+}
+
+.ripple:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
 /* Animated gradient background for sections */
 .gradient-bg {
-  background: linear-gradient(-45deg, #4F46E5, #818CF8, #F43F5E, #FB7185);
+  background: linear-gradient(-45deg, #6366F1, #A5B4FC, #EC4899, #F472B6);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
+}
+
+.gradient-bg-vibrant {
+  background: linear-gradient(-45deg, #4F46E5, #7C3AED, #EC4899, #8B5CF6);
+  background-size: 300% 300%;
+  animation: gradient 8s ease infinite;
 }
 
 @keyframes gradient {
@@ -86,6 +160,22 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
+/* Vibrant glass */
+.vibrant-glass {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.vibrant-glass:hover {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(80, 70, 229, 0.5);
+}
+
 /* Hover effects */
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -94,6 +184,16 @@ body {
 .hover-lift:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Vibrant hover */
+.hover-vibrant {
+  transition: all 0.3s ease;
+}
+
+.hover-vibrant:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
 }
 
 /* Animations */
@@ -106,10 +206,115 @@ body {
   animation: fadeIn 0.5s ease forwards;
 }
 
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scalein {
+  animation: scaleIn 0.3s ease forwards;
+}
+
+@keyframes pulse-vibrant {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-pulse-vibrant {
+  animation: pulse-vibrant 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
 /* Text gradient */
 .text-gradient {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   background-image: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.text-gradient-vibrant {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(90deg, #6366F1, #8B5CF6, #EC4899);
+  background-size: 200% auto;
+  animation: textShimmer 3s linear infinite;
+}
+
+@keyframes textShimmer {
+  to { background-position: 200% center; }
+}
+
+/* Interactive tags and badges */
+.badge {
+  @apply px-2 py-1 text-xs font-medium rounded-full;
+  transition: all 0.3s ease;
+}
+
+.badge:hover {
+  transform: scale(1.1);
+}
+
+/* Pulsing effect for notifications or important elements */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+/* Input focus effects */
+input:focus, 
+select:focus, 
+textarea:focus {
+  @apply ring-2 ring-indigo-500 ring-offset-2 outline-none;
+  transition: all 0.3s ease;
+}
+
+/* Custom selection color */
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: white;
+}
+
+/* Spotlight hover effect */
+.spotlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.spotlight:hover::before {
+  opacity: 1;
+  transform: scale(1);
 }
