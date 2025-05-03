@@ -8,8 +8,8 @@
   },
   "scripts": {
     "start": "node src/index.js",
+    "build": "echo 'skip build step'",
     "dev": "nodemon src/index.js",
-    "vercel-build": "npm install --no-save pg-native || echo 'Skipping pg-native installation' && echo 'Building backend for Vercel deployment'"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
