@@ -3,7 +3,7 @@ import axios from 'axios';
 // Use environment variable if available, otherwise use production URL, or fallback to local development URL
 const API_URL = import.meta.env && import.meta.env.VITE_API_URL 
   ? import.meta.env.VITE_API_URL
-  : "https://digital-diner-mxd2.onrender.com/api";
+  : "http://localhost:50001/api";
 
 // Create axios instance
 const api = axios.create({
