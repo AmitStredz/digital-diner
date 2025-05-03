@@ -15,7 +15,7 @@ const getSequelizeInstance = () => {
       sequelizeInstance.authenticate({logging: false});
       console.log('Reusing existing PostgreSQL connection');
       return sequelizeInstance;
-    } catch (err) {
+    } catch (error) {
       console.log('Existing connection invalid, creating new one');
       sequelizeInstance = null;
     }
@@ -60,24 +60,63 @@ const getSequelizeInstance = () => {
     // For Vercel deployment - provide fallback instead of crashing
     if (error.message.includes('install pg package') || error.message.includes('Cannot find module')) {
       console.warn('WARNING: PostgreSQL native bindings not available. Using fallback connection method.');
-      // Return a dummy sequelize instance that doesn't crash but logs errors
-      return {
+      
+      // Create a mock sequelize instance with all necessary methods for model definitions
+      const mockSequelize = {
         authenticate: async () => console.log('PostgreSQL connection skipped - native bindings not available'),
         query: async () => { throw new Error('PostgreSQL not available in this environment'); },
-        define: () => ({
-          findAll: async () => [],
-          findOne: async () => null,
-          create: async () => ({ id: 'dummy', createdAt: new Date() }),
-          update: async () => [0],
-          destroy: async () => 0
-        }),
+        define: (modelName, attributes, options) => {
+          console.log(`Mock model defined: ${modelName}`);
+          // Create a mock model with all necessary methods
+          const mockModel = {
+            findAll: async () => [],
+            findOne: async () => null,
+            create: async () => ({ id: 'dummy', createdAt: new Date() }),
+            update: async () => [0],
+            destroy: async () => 0,
+            // Add relationship methods
+            belongsTo: () => mockModel,
+            hasMany: () => mockModel,
+            hasOne: () => mockModel,
+            belongsToMany: () => mockModel,
+            // Add other necessary methods
+            sync: async () => mockModel,
+            count: async () => 0,
+            findByPk: async () => null
+          };
+          return mockModel;
+        },
         model: () => ({
           findAll: async () => [],
-          findOne: async () => null
+          findOne: async () => null,
+          // Add relationship methods
+          belongsTo: () => {},
+          hasMany: () => {},
+          hasOne: () => {},
+          belongsToMany: () => {}
         }),
         models: {},
-        close: async () => console.log('Dummy connection closed')
+        close: async () => console.log('Dummy connection closed'),
+        sync: async () => console.log('Mock sync performed'),
+        // DataTypes mock for model definitions
+        DataTypes: {
+          STRING: 'STRING',
+          TEXT: 'TEXT',
+          INTEGER: 'INTEGER',
+          FLOAT: 'FLOAT',
+          BOOLEAN: 'BOOLEAN',
+          DATE: 'DATE',
+          DATEONLY: 'DATEONLY',
+          DECIMAL: () => 'DECIMAL',
+          UUID: 'UUID',
+          UUIDV4: 'UUIDV4',
+          ENUM: () => 'ENUM',
+          JSON: 'JSON',
+          VIRTUAL: 'VIRTUAL'
+        }
       };
+      
+      return mockSequelize;
     }
     throw error;
   }
