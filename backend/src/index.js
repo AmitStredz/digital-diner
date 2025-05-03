@@ -16,15 +16,17 @@ const { connectPostgres } = require('./config/postgres');
 
 // Initialize app
 const app = express();
-const PORT = process.env.PORT || 50001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Connect to databases
-connectMongoDB();
-connectPostgres();
+// Connect to databases - only in development
+// In production (Vercel), connections will be made per-request
+if (process.env.NODE_ENV !== 'production') {
+  connectMongoDB();
+  connectPostgres();
+}
 
 // Routes
 app.use('/api/menu', menuRoutes);
@@ -36,7 +38,13 @@ app.get('/', (req, res) => {
   res.send('Digital Diner API is running');
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 50001;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export for serverless use
+module.exports = app; 

@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:50001/api';
+// Use environment variable if available, otherwise use production URL, or fallback to local development URL
+const API_URL = import.meta.env && import.meta.env.VITE_API_URL 
+  ? import.meta.env.VITE_API_URL 
+  : 'https://digital-diner-backend.vercel.app/api';
 
 // Create axios instance
 const api = axios.create({
