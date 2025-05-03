@@ -52,8 +52,7 @@ const signup = async (req, res) => {
     const token = generateToken(user);
     
     // Return user info (excluding password)
-    // const userToReturn = { ...user.toJSON() };
-    const userToReturn = user.get({ plain: true });
+    const userToReturn = { ...user?.toJSON() };
     delete userToReturn.password;
     
     res.status(201).json({
