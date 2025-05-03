@@ -2,6 +2,8 @@
 
 This is the backend API for "The Digital Diner" restaurant application. The API allows users to browse the menu, place orders, and view order history.
 
+Deployed frontend: https://digital-dinerr.netlify.app/
+
 ## Database Design
 
 This application uses both MongoDB and PostgreSQL databases:
@@ -33,7 +35,7 @@ This application uses both MongoDB and PostgreSQL databases:
    ```
 3. Create a `.env` file in the root directory with the following environment variables:
    ```
-   PORT=5000
+   PORT=50001
    MONGODB_URI=mongodb+srv://<db_username>:<db_password>@test.b2t9voc.mongodb.net/digital-diner
    POSTGRES_URI=postgresql://postgres:[YOUR-PASSWORD]@db.iaynguqaltrwighlrlsm.supabase.co:5432/postgres
    JWT_SECRET=your-secret-key
