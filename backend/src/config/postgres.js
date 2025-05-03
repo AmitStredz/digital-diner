@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const dotenv = require('dotenv');
+const pg = require('pg');
 
 dotenv.config();
 
@@ -29,29 +30,33 @@ const getSequelizeInstance = () => {
 
   // Create new connection
   try {
+    // sequelizeInstance = new Sequelize(connectionString, {
+    //   dialect: 'postgres',
+    //   logging: false,
+    //   // IMPORTANT: Disable native pg for Vercel compatibility
+    //   native: false,
+    //   pool: {
+    //     max: 2, // Maximum pool size for serverless
+    //     min: 0, // Minimum pool size
+    //     acquire: 15000, // Maximum time (ms) to acquire connection
+    //     idle: 5000 // Maximum time (ms) connection can be idle
+    //   },
+    //   dialectOptions: {
+    //     // For better performance in serverless
+    //     ssl: {
+    //       require: true,
+    //       rejectUnauthorized: false
+    //     },
+    //     // Avoid connection timeouts
+    //     connectTimeout: 30000
+    //   },
+    //   retry: {
+    //     max: 3 // Maximum retry attempts for failed queries
+    //   }
+    // });
     sequelizeInstance = new Sequelize(connectionString, {
       dialect: 'postgres',
-      logging: false,
-      // IMPORTANT: Disable native pg for Vercel compatibility
-      native: false,
-      pool: {
-        max: 2, // Maximum pool size for serverless
-        min: 0, // Minimum pool size
-        acquire: 15000, // Maximum time (ms) to acquire connection
-        idle: 5000 // Maximum time (ms) connection can be idle
-      },
-      dialectOptions: {
-        // For better performance in serverless
-        ssl: {
-          require: true,
-          rejectUnauthorized: false
-        },
-        // Avoid connection timeouts
-        connectTimeout: 30000
-      },
-      retry: {
-        max: 3 // Maximum retry attempts for failed queries
-      }
+      dialectModule: pg
     });
     
     return sequelizeInstance;
