@@ -30,39 +30,57 @@ app.get('/health', (req, res) => {
   res.status(200).send('Server is healthy');
 });
 
+// Basic route for testing
+app.get('/', (req, res) => {
+  res.send('Digital Diner API is running');
+});
+
+// Database connection status
+let isMongoConnected = false;
+let isPostgresConnected = false;
+
 // Setup database connection middleware for serverless
 const withDatabase = async (req, res, next) => {
   try {
-    // Only connect if we haven't already
-    if (process.env.NODE_ENV === 'production') {
-      await connectMongoDB();
-      await connectPostgres();
+    // Skip if already connected
+    if (!isMongoConnected) {
+      await connectMongoDB().catch(err => {
+        console.error("MongoDB connection error in middleware:", err.message);
+        throw err;
+      });
+      isMongoConnected = true;
     }
+    
+    if (!isPostgresConnected && process.env.NODE_ENV !== 'production') {
+      // Only try to connect to Postgres in non-production environments
+      // In production, we have a fallback in place
+      await connectPostgres().catch(err => {
+        console.error("PostgreSQL connection error in middleware:", err.message);
+        throw err;
+      });
+      isPostgresConnected = true;
+    }
+    
     next();
   } catch (error) {
-    console.error('Database connection error:', error);
-    res.status(500).json({ error: 'Database connection failed', details: error.message });
+    console.error('Database middleware error:', error.message);
+    // In production, try to continue even if DB connection fails
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('WARNING: Continuing despite database connection failure');
+      next();
+    } else {
+      res.status(500).json({ error: 'Database connection failed', details: error.message });
+    }
   }
 };
 
 // Apply database middleware to all API routes
 app.use('/api', withDatabase);
 
-// Connect to databases in development
-if (process.env.NODE_ENV !== 'production') {
-  connectMongoDB().catch(console.error);
-  connectPostgres().catch(console.error);
-}
-
 // Routes
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
-
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.send('Digital Diner API is running');
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
