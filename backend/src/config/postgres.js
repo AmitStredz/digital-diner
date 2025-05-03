@@ -8,21 +8,35 @@ let sequelizeInstance = null;
 
 // PostgreSQL connection factory
 const getSequelizeInstance = () => {
-  if (sequelizeInstance) {
-    return sequelizeInstance;
+  // If we already have a working connection, use it
+  if (sequelizeInstance && sequelizeInstance.authenticate) {
+    try {
+      // Quick connection check
+      sequelizeInstance.authenticate({logging: false});
+      console.log('Reusing existing PostgreSQL connection');
+      return sequelizeInstance;
+    } catch (err) {
+      console.log('Existing connection invalid, creating new one');
+      sequelizeInstance = null;
+    }
+  }
+
+  // Get connection string - fail early if missing
+  const connectionString = process.env.POSTGRES_URI;
+  if (!connectionString) {
+    throw new Error('POSTGRES_URI environment variable is not set');
   }
 
   // Create new connection
-  sequelizeInstance = new Sequelize(
-    process.env.POSTGRES_URI || 'postgresql://postgres:[YOUR-PASSWORD]@db.iaynguqaltrwighlrlsm.supabase.co:5432/postgres',
-    {
+  try {
+    sequelizeInstance = new Sequelize(connectionString, {
       dialect: 'postgres',
       logging: false,
       pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
+        max: 2, // Maximum pool size for serverless
+        min: 0, // Minimum pool size
+        acquire: 15000, // Maximum time (ms) to acquire connection
+        idle: 5000 // Maximum time (ms) connection can be idle
       },
       dialectOptions: {
         // For better performance in serverless
@@ -31,12 +45,18 @@ const getSequelizeInstance = () => {
           rejectUnauthorized: false
         },
         // Avoid connection timeouts
-        connectTimeout: 60000
+        connectTimeout: 30000
+      },
+      retry: {
+        max: 3 // Maximum retry attempts for failed queries
       }
-    }
-  );
-
-  return sequelizeInstance;
+    });
+    
+    return sequelizeInstance;
+  } catch (error) {
+    console.error('PostgreSQL instance creation error:', error.message);
+    throw error;
+  }
 };
 
 const connectPostgres = async () => {
@@ -52,7 +72,21 @@ const connectPostgres = async () => {
   }
 };
 
+// Helper to close connections when serverless function is done
+const closePostgresConnection = async () => {
+  if (sequelizeInstance) {
+    try {
+      await sequelizeInstance.close();
+      sequelizeInstance = null;
+      console.log('PostgreSQL connection closed');
+    } catch (error) {
+      console.error('Error closing PostgreSQL connection:', error);
+    }
+  }
+};
+
 module.exports = { 
   sequelize: getSequelizeInstance(),
-  connectPostgres
+  connectPostgres,
+  closePostgresConnection
 }; 

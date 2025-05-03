@@ -18,14 +18,40 @@ const { connectPostgres } = require('./config/postgres');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json());
 
-// Connect to databases - only in development
-// In production (Vercel), connections will be made per-request
+// Health check route - always works even if DB fails
+app.get('/health', (req, res) => {
+  res.status(200).send('Server is healthy');
+});
+
+// Setup database connection middleware for serverless
+const withDatabase = async (req, res, next) => {
+  try {
+    // Only connect if we haven't already
+    if (process.env.NODE_ENV === 'production') {
+      await connectMongoDB();
+      await connectPostgres();
+    }
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ error: 'Database connection failed', details: error.message });
+  }
+};
+
+// Apply database middleware to all API routes
+app.use('/api', withDatabase);
+
+// Connect to databases in development
 if (process.env.NODE_ENV !== 'production') {
-  connectMongoDB();
-  connectPostgres();
+  connectMongoDB().catch(console.error);
+  connectPostgres().catch(console.error);
 }
 
 // Routes
@@ -36,6 +62,16 @@ app.use('/api/auth', authRoutes);
 // Basic route for testing
 app.get('/', (req, res) => {
   res.send('Digital Diner API is running');
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ 
+    error: 'Server error', 
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack 
+  });
 });
 
 // For local development
