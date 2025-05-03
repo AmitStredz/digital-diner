@@ -56,7 +56,8 @@ const getSequelizeInstance = () => {
     
     const sequelizeInstance = new Sequelize(connectionString, {
       dialect: 'postgres',
-      dialectModule: pg
+      dialectModule: pg,
+      logging: false,
     });
     return sequelizeInstance;
   } catch (error) {
