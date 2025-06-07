@@ -1,8 +1,5 @@
 # The Digital Diner API
 
-This is an application which allows users to order food, adding to cart, fetching order details.
-Below is the detailed explanation and other details about the backend.
-
 ## Database Design
 
 This application uses both MongoDB and PostgreSQL databases:
