@@ -30,30 +30,30 @@ const LoadingSpinner = () => (
 );
 
 // Protected route component
-// const ProtectedRoute = ({ children }) => {
-//   const { user, loading } = useAuth();
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
   
-//   if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner />;
   
-//   if (!user) {
-//     return <Navigate to="/login" replace />;
-//   }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
   
-//   return children;
-// };
+  return children;
+};
 
-// // Admin route component
-// const AdminRoute = ({ children }) => {
-//   const { user, isAdmin, loading } = useAuth();
+// Admin route component
+const AdminRoute = ({ children }) => {
+  const { user, isAdmin, loading } = useAuth();
   
-//   if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner />;
   
-//   if (!user || !isAdmin()) {
-//     return <Navigate to="/" replace />;
-//   }
+  if (!user || !isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
   
-//   return children;
-// };
+  return children;
+};
 
 // App component needs to be defined after the hooks
 const AppContent = () => {
